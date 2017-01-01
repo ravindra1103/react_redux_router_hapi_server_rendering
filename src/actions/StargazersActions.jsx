@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import {
-	STARGAZERS_FETCH, STARGAZERS_REQUEST,
+	STARGAZERS_FETCH,
+	STARGAZERS_REQUEST,
 	STARGAZERS_STOP_FETCH
 } from './actionTypes.jsx';
 
