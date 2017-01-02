@@ -63,9 +63,8 @@ server.register(
       auth: 'session',
       handler: function (request, reply) {
         if (request.auth.isAuthenticated) {
-          return reply.redirect(requst.path);
+          return reply.file("static" + request.path);
         }
-        return reply.redirect("/login");
       }
     }
   });
