@@ -9,6 +9,9 @@ import RadiumContainer from './containers/RadiumContainer.jsx';
 import { Provider } from 'react-redux';
 import routesContainer from "./routes.jsx";
 import url from "url";
+import CookieAuth from 'hapi-auth-cookie';
+import Boom from 'boom';
+import Bcrypt from 'bcrypt';
 let routes = routesContainer;
 
 /**
@@ -32,30 +35,100 @@ server.connection({host: hostname, port: port});
 server.register(
   [
     h2o2,
-    inert
+    inert,
+    CookieAuth
   ],
   (err) => {
     if (err) {
       throw err;
     }
-
-    server.start(() => {
-      console.info("==> ✅  Server is listening");
-      console.info("==> 🌎  Go to " + server.info.uri.toLowerCase());
+    var Users = {
+      future: {
+        username: 'future',
+        password: '$2a$04$YPy8WdAtWswed8b9MfKixebJkVUhEZxQCrExQaxzhcdR2xMmpSJiG',   // 'studio'
+        name: 'Future Studio',
+        id: '1'
+      }
+    };
+    server.auth.strategy('session', 'cookie', true, {
+      password: 'm!*"2/),p4:xDs%KEgVr7;e#85Ah^WYC',
+      cookie: 'future-studio-hapi-tutorials-cookie-auth-example',
+      isSecure: false
     });
+
+  server.route({
+    method:  "GET",
+    path:    "/{params*}",
+    config: {
+      auth: 'session',
+      handler: function (request, reply) {
+        if (request.auth.isAuthenticated) {
+          return reply.redirect(requst.path);
+        }
+        return reply.redirect("/login");
+      }
+    }
   });
 
-  /**
-  * Attempt to serve static requests from the public folder.
-  */
-server.route({
-  method:  "GET",
-  path:    "/{params*}",
-  handler: {
-    file: (request) => "static" + request.path
-  }
-});
-
+  server.route({
+    method:  "GET",
+    path:    "/index",
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        return reply.file("static" + request.path);
+      }
+    }
+  });
+  server.route({
+    method:  "GET",
+    path:    "/logo.svg",
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        return reply.file("static" + request.path);
+      }
+    }
+  });
+  server.route({
+    method:  "POST",
+    path:    "/login",
+    config: {
+      auth: false,
+      handler: function(request, reply) {
+        console.log("handle in login");
+        var password = request.payload.password;
+        var username = request.payload.username;
+        var user = Users[ username ];
+        return Bcrypt.compare(password, user.password, function (err, isValid) {
+          if (isValid) {
+            console.log("user authentication successful");
+            request.server.log('info', 'user authentication successful');
+            request.cookieAuth.set(user);
+            return reply.redirect("/home");
+          } else {
+            return reply.redirect("/index");
+          }
+        });
+        return reply.redirect("/index");
+      }
+    }
+  });
+  server.route({
+    method:  "GET",
+    path:    "/logout",
+    config: {
+      auth: 'session',
+      handler: function (request, reply) {
+        console.log("handle in logout");
+        if (request.cookieAuth) {
+          request.cookieAuth.clear();
+          console.log("logged out successfully");
+        }
+        return reply.redirect("/index");
+      }
+    }
+  });
   /**
   * Endpoint that proxies all GitHub API requests to https://api.github.com.
   */
@@ -79,6 +152,14 @@ server.route({
     }
   }
 });
+    server.start(() => {
+      console.info("==> Server is listening");
+      console.info("==> Go to " + server.info.uri.toLowerCase());
+    });
+  });
+
+
+
 
   /**
   * Catch dynamic requests here to fire-up React Router.
