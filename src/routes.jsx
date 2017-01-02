@@ -13,7 +13,7 @@ import Index from './components/Index.jsx';
  */
 module.exports = (
 	<Router>
-		<Route path="/index" component={Index} />
+		<Route path="/" component={Index} />
 		<Route component={StargazersContainer}>
 			<Route component={Header}>
 				<Route path="/home" component={Home} />

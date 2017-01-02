@@ -75,7 +75,7 @@ export default ({children}) => (
 	<div>
 		<div style={styles.nav}>
 			<ul>
-				<li style={styles.list}><Link style={styles.navLink} to="/" activeClassName="active">Home</Link></li>
+				<li style={styles.list}><Link style={styles.navLink} to="/home" activeClassName="active">Home</Link></li>
 				<li style={styles.list}><Link style={styles.navLink}  to="/about" activeClassName="active">About</Link></li>
         <li style={styles.list}><Link style={styles.navLink}  to="/todo" activeClassName="active">Todo</Link></li>
         <li style={styles.list}><Link style={styles.navLink}  to="/extras" activeClassName="active">Extras</Link></li>

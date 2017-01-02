@@ -106,10 +106,10 @@ server.register(
             request.cookieAuth.set(user);
             return reply.redirect("/home");
           } else {
-            return reply.redirect("/index");
+            return reply.redirect("/");
           }
         });
-        return reply.redirect("/index");
+        return reply.redirect("/");
       }
     }
   });
@@ -124,7 +124,7 @@ server.register(
           request.cookieAuth.clear();
           console.log("logged out successfully");
         }
-        return reply.redirect("/index");
+        return reply.redirect("/");
       }
     }
   });
